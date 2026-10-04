@@ -69,13 +69,13 @@ export async function writeRelatedProperty(
 
 	const key = settings.relatedPropertyName || 'related';
 	const links = computeRelatedLinks(plugin, file.path);
-	const current = plugin.app.metadataCache.getFileCache(file)?.frontmatter?.[key];
+	const current: unknown = plugin.app.metadataCache.getFileCache(file)?.frontmatter?.[key];
 
 	if (sameLinks(current, links)) return false;
 	if (links.length === 0 && current === undefined) return false;
 
 	await plugin.writeGuard.guard(file.path, () =>
-		plugin.app.fileManager.processFrontMatter(file, fm => {
+		plugin.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
 			if (links.length > 0) fm[key] = links;
 			else delete fm[key];
 		})
@@ -106,7 +106,7 @@ export async function clearRelatedProperty(
 	file: TFile
 ): Promise<boolean> {
 	const key = plugin.settings.relatedPropertyName || 'related';
-	const current = plugin.app.metadataCache.getFileCache(file)?.frontmatter;
+	const current: Record<string, unknown> | undefined = plugin.app.metadataCache.getFileCache(file)?.frontmatter;
 	if (!current || !(key in current)) return false;
 
 	const value = current[key];
@@ -115,7 +115,7 @@ export async function clearRelatedProperty(
 	if (keep.length === entries.length) return false;
 
 	await plugin.writeGuard.guard(file.path, () =>
-		plugin.app.fileManager.processFrontMatter(file, fm => {
+		plugin.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
 			if (keep.length > 0) fm[key] = keep;
 			else delete fm[key];
 		})

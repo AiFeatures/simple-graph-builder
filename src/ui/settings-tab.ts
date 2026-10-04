@@ -34,7 +34,9 @@ interface DeclarativeSettingDefinition {
 	aliases?: string[];
 	visible?: () => boolean;
 	control?: DeclarativeControl;
-	render?: (setting: Setting) => void;
+	// Renderers return the Setting they chain on, which has a then() and so
+	// reads as a promise against a void return. The value is ignored.
+	render?: (setting: Setting) => unknown;
 }
 
 interface DeclarativeSettingGroup {

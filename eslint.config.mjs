@@ -22,6 +22,16 @@ export default [
     rules: {
       ...obsidian.configs.recommended.rules,
       ...tseslint.configs.recommended.rules,
+      // The Obsidian review bot also runs these; keep them local so lint
+      // catches what the bot would.
+      "@typescript-eslint/no-unsafe-assignment": "error",
+      "@typescript-eslint/no-unsafe-member-access": "error",
+      "@typescript-eslint/no-misused-promises": "error",
+      "no-restricted-globals": ["error",
+        ...["setTimeout", "clearTimeout", "setInterval", "clearInterval", "requestAnimationFrame", "cancelAnimationFrame"]
+          .map(name => ({ name, message: `Use window.${name}() for popout window compatibility.` })),
+        { name: "globalThis", message: "Use window or activeWindow for popout window compatibility." },
+      ],
     },
   },
 ];

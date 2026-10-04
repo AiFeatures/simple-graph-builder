@@ -311,7 +311,7 @@ async function writeEntityNote(
 
 	if (needsFrontmatter) {
 		await plugin.writeGuard.guard(file.path, () =>
-			plugin.app.fileManager.processFrontMatter(file, fm => {
+			plugin.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
 				fm[ID_KEY] = node.id;
 				fm[TYPE_KEY] = node.entityType;
 				if (aliases.length > 0) fm[ALIASES_KEY] = aliases;

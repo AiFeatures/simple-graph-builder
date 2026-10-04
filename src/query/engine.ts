@@ -73,7 +73,7 @@ export class QueryEngine {
 		private readonly source: VaultSource,
 		options: QueryEngineOptions = {}
 	) {
-		this.yieldFn = options.yieldFn ?? (() => new Promise(resolve => setTimeout(resolve, 0)));
+		this.yieldFn = options.yieldFn ?? (() => new Promise(resolve => window.setTimeout(resolve, 0)));
 		this.yieldEvery = options.yieldEvery ?? 25;
 	}
 

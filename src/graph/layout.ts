@@ -112,15 +112,9 @@ export function spacingForNodeCount(count: number): number {
 	return Math.max(MIN_SPACING, Math.min(MAX_SPACING, affordable));
 }
 
+// Headless layout tests pass their own scheduler.
 function defaultSchedule(cb: () => void): void {
-	if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
-		window.requestAnimationFrame(() => cb());
-	} else if (typeof window !== 'undefined') {
-		window.setTimeout(cb, 0);
-	} else {
-		// Headless layout tests run without a DOM window.
-		globalThis.setTimeout(cb, 0);
-	}
+	window.requestAnimationFrame(() => cb());
 }
 
 /** Union-find, path-halving. Returns a component index per node position. */

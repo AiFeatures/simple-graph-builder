@@ -155,9 +155,13 @@ export async function readMedLitSnapshot(reader: SnapshotReader): Promise<MedLit
 	let skipped = 0;
 	let stale = 0;
 
-	for (const rel of await reader.listMarkdown()) {
-		const text = await reader.readText(rel);
+	for (const onDisk of await reader.listMarkdown()) {
+		const text = await reader.readText(onDisk);
 		if (text === null) continue;
+		// macOS hands back decomposed (NFD) names for files a sync tool wrote,
+		// while med-lit writes its export in NFC. Compare, and write into the
+		// vault, in NFC; only the read above uses the name as found.
+		const rel = onDisk.normalize('NFC');
 		const content = normalizeContent(text);
 		const frontmatter = parseJsonFrontmatter(content);
 		// A page whose generator line was removed is one the user took over in

@@ -23,7 +23,7 @@ export interface SgbExport {
 	/** The bot update this export reflects; null without a bot. */
 	botUpdate: number | null;
 	kg: MedLitKg;
-	/** Project-relative page paths by file key, as med-lit wrote them. */
+	/** Project-relative page paths by file key, as med-lit wrote them, in NFC. */
 	pages: Map<string, string>;
 	/** Entities med-lit typed with something that is not an SGB type. */
 	untyped: number;
@@ -65,7 +65,7 @@ export function parseSgbExport(text: string): SgbExport {
 	const entities = list(raw.entities).map(e => {
 		const id = Number(e.id);
 		const page = optStr(e.page);
-		if (page) pages.set(`entity:${id}`, page);
+		if (page) pages.set(`entity:${id}`, page.normalize('NFC'));
 		const sgbType = isExtractionType(e.sgb_type) ? e.sgb_type : 'CONCEPT';
 		if (!isExtractionType(e.sgb_type)) untyped++;
 		return {
@@ -84,7 +84,7 @@ export function parseSgbExport(text: string): SgbExport {
 		if (!uid) continue;
 		articleUids.push(uid);
 		const page = optStr(a.page);
-		if (page) pages.set(`source:${uid}`, page);
+		if (page) pages.set(`source:${uid}`, page.normalize('NFC'));
 	}
 
 	const kg: MedLitKg = {

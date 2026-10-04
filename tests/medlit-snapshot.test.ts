@@ -88,6 +88,22 @@ async function expectError(name: string, reader: MemoryReader, pattern: RegExp) 
 	const running = await readMedLitSnapshot(buildProject({ ...base, bot: { active: { update: 4 }, history: [] } }));
 	check('run in progress reported', running.warnings.some(w => /in progress/.test(w)));
 
+	// A Korean page synced to a Mac is listed in NFD; the export names it in NFC.
+	const korean = buildProject({
+		...base,
+		entities: [...base.entities, { id: 4, name: '환자 안전', type: 'CONCEPT', sgb: 'CONCEPT' }],
+		articles: [...base.articles, { uid: 'pubmed:3', title: '김 2026 - 환자 안전', mentions: [[4, null]] }],
+	});
+	for (const rel of [...korean.files.keys()]) {
+		const nfd = rel.normalize('NFD');
+		if (nfd !== rel) { korean.set(nfd, korean.files.get(rel)!); korean.delete(rel); }
+	}
+	const koreanSnap = await readMedLitSnapshot(korean);
+	check('NFD page names match the NFC export', koreanSnap.files.some(f => f.key === 'entity:4') && koreanSnap.files.some(f => f.key === 'source:pubmed:3'),
+		koreanSnap.warnings.join('; '));
+	check('NFD pages land in the vault under NFC names', koreanSnap.files.filter(f => f.rel !== f.rel.normalize('NFC')).length === 0);
+	check('no NFD page reported stale', !koreanSnap.warnings.some(w => /leftover/.test(w)), koreanSnap.warnings.join('; '));
+
 	const parsed = parseJsonFrontmatter('---\ngenerator: med-lit-bot\ndate: 2026-10-01\nsources: 7\naliases: ["A", "B"]\n---\nbody');
 	check('frontmatter JSON values', parsed?.sources === 7 && Array.isArray(parsed?.aliases));
 	check('frontmatter plain scalars', parsed?.date === '2026-10-01');

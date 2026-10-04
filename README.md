@@ -8,9 +8,18 @@ This plugin builds a lightweight knowledge graph from users' Obsidian notes usin
 
 ![Graph View](https://raw.githubusercontent.com/junhewk/simple-graph-builder/master/docs/graph-view.png)
 
-## What's new in 0.7.1
+## What's new in 0.7.2
 
-### Import literature reviews from med-lit-mcp
+**med-lit pages with Korean or accented names now import on a Mac.** A
+project folder synced to a Mac can store its file names in decomposed Unicode
+(NFD), while med-lit names the pages in its export in composed form (NFC). The
+names then never matched, so those pages were left out as "leftover" pages, and
+their entities joined the graph without one. The import now compares names in
+composed form and writes the pages into the vault under those names. If an
+earlier import left pages out, run **Update** on the project to add them. See
+[Upgrading to 0.7.2](#upgrading-to-072).
+
+### Previously, in 0.7.1: import literature reviews from med-lit-mcp
 
 [**med-lit-mcp**](https://github.com/junhewk/med-lit-mcp) is a companion tool
 for medical literature reviews, by the same author. It is an MCP server: you
@@ -351,7 +360,7 @@ See [Importing med-lit Projects](#importing-med-lit-projects).
 ## Importing med-lit Projects
 
 [med-lit-mcp](https://github.com/junhewk/med-lit-mcp) (see
-[What's new in 0.7.1](#whats-new-in-071)) keeps each review in a project folder,
+[what's new in 0.7.1](#previously-in-071-import-literature-reviews-from-med-lit-mcp)) keeps each review in a project folder,
 `~/med-lit/<review name>/` by default:
 
 ```
@@ -458,6 +467,12 @@ puts the schema in the prompt and still validates every reply against it. At
 the default *Minimal* reasoning effort, DeepSeek's thinking is switched off.
 At higher levels it stays on, and the output budget is raised to 32k tokens,
 because DeepSeek counts thinking against it.
+
+## Upgrading to 0.7.2
+
+Nothing changes for an existing vault. If a med-lit import reported leftover
+pages that are in fact part of the review, run **Update** on the project: the
+missing pages are added, and the pages already imported are left as they are.
 
 ## Upgrading to 0.7.1
 
@@ -620,6 +635,7 @@ npm run dev     # watch build
 npm run build   # production build (typecheck + bundle)
 npm test        # wire-level and engine tests
 npm test -- gemini   # run one suite
+npm run lint    # includes the type-aware checks the Obsidian review bot runs
 npm run eval    # live end-to-end check against the real provider APIs
 ```
 
